@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/router/route_names.dart';
+
+/// Splash Screen - ZRent Agent App
+///
+/// Initial launch screen displaying:
+/// - Lime green background
+/// - ZRent logo with building icon
+/// - "ZRent" branding text
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Navigate to Get Started screen after delay
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        context.go(RouteNames.getStarted);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Set status bar color to match splash background
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Color(0xFF84CC16), // Lime green
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF84CC16), // Lime green background
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo image
+              Image.asset(
+                'assets/images/splash_logo.png',
+                width: 120,
+                height: 120,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 24),
+              // ZRent text
+              const Text(
+                'ZRent',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 42,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1E3A8A), // Dark blue
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

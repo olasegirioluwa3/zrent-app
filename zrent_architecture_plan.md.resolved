@@ -1,0 +1,215 @@
+# ZRent Platform — Flutter Architecture Plan
+
+## Overview
+
+Two Flutter mobile apps sharing a **single Supabase backend** via a common `shared` package structure within each app.
+
+---
+
+## Project Root Layout
+
+```
+s:\ZED\Zrent\
+├── Agent Publisher-owner/     ← ZRent Agent App (Flutter)
+├── User-Buyer/                ← ZRent Buyer App (Flutter)
+└── packages/                  ← Shared Dart packages (optional mono-repo)
+    └── zrent_core/            ← Shared models, services, constants
+```
+
+---
+
+## Feature-First Architecture (Per App)
+
+Each app follows **feature-first** with **4-layer architecture** per feature:
+
+```
+lib/
+├── app.dart                   ← MaterialApp + GoRouter + Riverpod scope
+├── main.dart                  ← Entry point
+├── bootstrap.dart             ← Init Supabase, Firebase, env
+│
+├── core/                      ← App-wide infrastructure
+│   ├── constants/             ← App constants, enums, keys
+│   ├── errors/                ← Failures, exceptions
+│   ├── extensions/            ← Dart extensions
+│   ├── network/               ← Dio client, interceptors
+│   ├── providers/             ← Global Riverpod providers
+│   ├── router/                ← GoRouter config + route names
+│   ├── theme/                 ← ThemeData, colors, typography
+│   └── utils/                 ← Formatters, validators, helpers
+│
+├── config/                    ← Environment & 3rd party config
+│   ├── env.dart               ← Env variables
+│   ├── supabase_config.dart   ← Supabase init
+│   ├── firebase_config.dart   ← FCM init
+│   └── stripe_config.dart     ← Payment config
+│
+├── shared/                    ← Cross-feature shared code
+│   ├── models/                ← Shared Freezed models
+│   ├── widgets/               ← Reusable UI components
+│   ├── services/              ← Shared services (location, storage)
+│   ├── providers/             ← Shared Riverpod providers
+│   └── repositories/          ← Shared repository interfaces
+│
+└── features/                  ← Feature modules (see below)
+    └── <feature_name>/
+        ├── presentation/      ← Screens, widgets, providers
+        │   ├── screens/
+        │   ├── widgets/
+        │   └── providers/
+        ├── application/       ← Use cases, business logic
+        │   └── usecases/
+        ├── domain/            ← Entities, repo interfaces, models
+        │   ├── entities/
+        │   ├── models/
+        │   └── repositories/
+        └── data/              ← Supabase services, DTOs, repo impl
+            ├── datasources/
+            ├── dtos/
+            └── repositories/
+```
+
+---
+
+## Agent App — Feature Modules
+
+| Feature | Description |
+|---|---|
+| `auth` | Login, register, password reset, OTP |
+| `dashboard` | Overview, stats, quick actions |
+| `properties` | Publish, edit, manage listings |
+| `wallet` | Balance, transaction history |
+| `withdrawals` | Request withdrawal, withdrawal history |
+| `verification` | KYC, document upload, status |
+| `messages` | Chat with buyers, media sharing |
+| `notifications` | Push, in-app notification feed |
+| `orders` | Incoming offers, transaction tracking |
+| `analytics` | Property performance, views, leads |
+| `subscription` | Tier management, upgrade, billing |
+| `profile` | Agent profile, public profile preview |
+| `settings` | App settings, account, privacy |
+
+## Buyer App — Feature Modules
+
+| Feature | Description |
+|---|---|
+| `auth` | Login, register, password reset, OTP |
+| `home` | Landing, featured, trending properties |
+| `discover` | Map-based discovery, categories |
+| `search` | Search filters, results, suggestions |
+| `favorites` | Saved properties |
+| `property` | Property detail, gallery, map, agent |
+| `agent_profile` | View agent info, reviews, listings |
+| `messages` | Chat with agents, media sharing |
+| `checkout` | Offer flow, escrow initiation |
+| `payments` | Payment methods, escrow payments |
+| `orders` | Transaction tracking, confirmation |
+| `notifications` | Push, in-app notification feed |
+| `profile` | Buyer profile, preferences |
+| `settings` | App settings, account, privacy |
+
+---
+
+## Core Layer Details
+
+### Router (GoRouter)
+- Route names as constants in `core/router/route_names.dart`
+- Route config in `core/router/app_router.dart`
+- Auth redirect guard in `core/router/guards/auth_guard.dart`
+- Nested navigation for tabs (Buyer: home/discover/favorites/messages/profile)
+
+### State Management (Riverpod)
+- `@riverpod` code generation with `riverpod_generator`
+- Feature-scoped providers in `features/<name>/presentation/providers/`
+- Global providers in `core/providers/`
+- Shared providers in `shared/providers/`
+
+### Repository Pattern
+- **Domain layer**: Abstract repository interfaces
+- **Data layer**: Concrete implementations calling Supabase
+- Riverpod providers expose repositories via `ref.watch()`
+
+### Supabase Integration
+- Auth → `supabase.auth`
+- Database → `supabase.from('table')`
+- Storage → `supabase.storage.from('bucket')`
+- Realtime → `supabase.channel()` for messaging
+- Edge Functions → `supabase.functions.invoke()`
+
+---
+
+## Shared Models (Freezed)
+
+Key shared models across both apps:
+- `UserModel` — Auth user profile
+- `PropertyModel` — Property listing
+- `PropertyMediaModel` — Images, videos, documents
+- `MessageModel` — Chat message
+- `OrderModel` — Transaction/order
+- `EscrowModel` — Escrow state machine
+- `WalletModel` — Agent wallet
+- `ReviewModel` — Agent/property reviews
+- `LocationModel` — Lat/lng, address, country
+- `VerificationModel` — KYC/document status
+- `SubscriptionModel` — Agent tier
+- `NotificationModel` — Push/in-app notification
+- `OfferModel` — Buyer offer on property
+
+---
+
+## Key Dependencies
+
+```yaml
+# State Management
+flutter_riverpod, riverpod_annotation, riverpod_generator
+
+# Code Generation
+freezed, freezed_annotation, json_annotation, json_serializable, build_runner
+
+# Navigation
+go_router
+
+# Backend
+supabase_flutter
+
+# Network
+dio
+
+# Maps & Location
+google_maps_flutter, geolocator, geocoding
+
+# Payments
+flutter_stripe, flutterwave_standard
+
+# Notifications
+firebase_messaging, firebase_core, flutter_local_notifications
+
+# Media
+image_picker, cached_network_image
+
+# UI
+flutter_svg, shimmer, lottie
+
+# Utils
+intl, url_launcher, share_plus, permission_handler
+```
+
+---
+
+## Escrow State Machine
+
+```
+PENDING → FUNDS_HELD → INSPECTION → VERIFICATION → APPROVED → RELEASED
+                                                  ↘ DISPUTED
+                                      ↘ REFUNDED
+```
+
+---
+
+## Next Steps
+
+1. ✅ Architecture plan (this document)
+2. 🔜 Scaffold both Flutter projects with folder structure
+3. 🔜 Create core files (bootstrap, router, theme, providers)
+4. 🔜 Create feature module skeletons
+5. ⏳ Await Figma Source of Truth for UI implementation

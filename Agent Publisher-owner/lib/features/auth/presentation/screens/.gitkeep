@@ -1,0 +1,4 @@
+// Auth feature — presentation layer placeholders
+// Screens: login_screen.dart, register_screen.dart, forgot_password_screen.dart, otp_screen.dart
+// Widgets: auth_form.dart, social_auth_button.dart
+// Providers: auth_providers.dart, auth_state.dart
