@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../shared/providers/properties_provider.dart';
 import '../../../agent_profile/presentation/screens/agent_profile_screen.dart';
 import '../../../messages/presentation/screens/chat_detail_screen.dart';
 
@@ -12,7 +14,8 @@ import '../../../messages/presentation/screens/chat_detail_screen.dart';
 /// - Location row with pin icon
 /// - Agent avatar and checkmarked "Agent Verified" badge
 /// - Message bubble icon on the right
-class PropertyCard extends StatelessWidget {
+class PropertyCard extends ConsumerWidget {
+  final String id;
   final String imageUrl;
   final String price;
   final String title;
@@ -23,6 +26,7 @@ class PropertyCard extends StatelessWidget {
 
   const PropertyCard({
     super.key,
+    required this.id,
     required this.imageUrl,
     required this.price,
     required this.title,
@@ -33,7 +37,7 @@ class PropertyCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final darkTeal = const Color(0xFF042F2C);
 
     return Container(
@@ -85,18 +89,24 @@ class PropertyCard extends StatelessWidget {
               Positioned(
                 top: 10,
                 right: 10,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: const Color(0xFF84CC16), // Lime Green
-                      size: 18,
+                child: GestureDetector(
+                  onTap: () {
+                    ref.read(propertiesProvider.notifier).toggleFavorite(id);
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: const Color(0xFFBEF264), // Figma Lime Green (0xFFBEF264 / 0xFF84CC16)
+                        size: 18,
+                      ),
                     ),
                   ),
                 ),
@@ -176,37 +186,37 @@ class PropertyCard extends StatelessWidget {
                             backgroundImage: NetworkImage(agentAvatarUrl),
                           ),
                         ),
-                        if (isAgentVerified) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFBEF264), // Bright Lime Green
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Agent Verified',
-                                  style: GoogleFonts.poppins(
-                                    color: darkTeal,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(width: 2),
-                                Icon(
-                                  Icons.check_circle,
-                                  color: darkTeal,
-                                  size: 10,
-                                ),
-                              ],
-                            ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
                           ),
-                        ],
+                          decoration: BoxDecoration(
+                            color: isAgentVerified
+                                ? const Color(0xFFBEF264)
+                                : const Color(0xFFFECACA), // Verified = Lime Green, Not Verified = Red
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                isAgentVerified ? 'Agent Verified' : 'Not Verified',
+                                style: GoogleFonts.poppins(
+                                  color: darkTeal,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              Icon(
+                                isAgentVerified ? Icons.check_circle : Icons.cancel,
+                                color: darkTeal,
+                                size: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                     // Chat Message bubble icon
@@ -214,7 +224,7 @@ class PropertyCard extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const ChatDetailScreen(),
+                            builder: (context) => ChatDetailScreen(propertyId: id),
                           ),
                         );
                       },

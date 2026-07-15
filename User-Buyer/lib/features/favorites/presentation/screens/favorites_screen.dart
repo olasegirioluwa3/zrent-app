@@ -1,60 +1,50 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
-import '../widgets/favorites_header.dart';
-import '../widgets/favorites_filter.dart';
-import '../widgets/favorite_property_card.dart';
+import '../widgets/favorites_app_bar.dart';
+import '../widgets/orders_list.dart';
+import '../widgets/saved_properties_grid.dart';
+import '../../../home/presentation/widgets/bottom_nav_bar.dart';
 
 /// Favorites Screen - ZRent Buyer App
-/// 
-/// Saved/favorite properties with:
-/// - Header with title
-/// - Filter options
-/// - Grid of saved properties
+///
+/// Layout matching the Figma design screenshot:
+/// - Clean search bar at the top (app bar)
+/// - Orders List horizontal scrolling feed
+/// - Saved property grid (2-column layout)
+/// - Persistent bottom navigation bar (Favorites index 2)
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF9FAFB),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
-            const SizedBox(height: 16),
-            const FavoritesHeader(),
-            const SizedBox(height: 16),
-            const FavoritesFilter(),
-            const SizedBox(height: 24),
-            // Property Grid
+            // App Bar with search input & location
+            const FavoritesAppBar(),
+            // Scrollable Content area
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    return FavoritePropertyCard(
-                      imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400',
-                      title: 'Modern Apartment',
-                      location: 'Lekki, Lagos',
-                      price: '₦450,000',
-                      rating: 4.8,
-                      onRemove: () {},
-                    );
-                  },
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    SizedBox(height: 12),
+                    OrdersList(),
+                    SizedBox(height: 24),
+                    SavedPropertiesGrid(),
+                    SizedBox(height: 32),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 100), // Space for bottom nav
           ],
         ),
       ),
+      // Persistent Bottom Navigation Bar
+      bottomNavigationBar: const BottomNavBar(initialIndex: 2),
     );
   }
 }

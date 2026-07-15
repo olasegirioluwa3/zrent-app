@@ -4,6 +4,7 @@ import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../discover/presentation/screens/discover_screen.dart';
 import '../../../favorites/presentation/screens/favorites_screen.dart';
 import '../../../messages/presentation/screens/messages_screen.dart';
+import '../screens/home_screen.dart';
 
 /// Bottom Navigation Bar Widget - ZRent Buyer App
 ///
@@ -14,14 +15,21 @@ import '../../../messages/presentation/screens/messages_screen.dart';
 /// - Messages (index 3) — MessagesScreen
 /// - Profile (index 4) — ProfileScreen
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({super.key});
+  final int initialIndex;
+  const BottomNavBar({super.key, this.initialIndex = 0});
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _onItemTapped(BuildContext context, int index) {
     if (_selectedIndex == index) return;
@@ -30,6 +38,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
     Widget? screen;
     switch (index) {
+      case 0:
+        screen = const HomeScreen();
+        break;
       case 1:
         screen = const DiscoverScreen();
         break;
@@ -42,20 +53,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 4:
         screen = const ProfileScreen();
         break;
-      default:
-        // Home — no navigation needed; already on home
-        return;
     }
 
     if (screen != null) {
       Navigator.of(context)
-          .push(
+          .pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => screen!),
-          )
-          .then((_) {
-        // Reset to Home when coming back
-        if (mounted) setState(() => _selectedIndex = 0);
-      });
+            (route) => false,
+          );
     }
   }
 
