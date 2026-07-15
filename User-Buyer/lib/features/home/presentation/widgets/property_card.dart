@@ -176,7 +176,10 @@ class PropertyCard extends ConsumerWidget {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const AgentProfileScreen(),
+                                builder: (context) => AgentProfileScreen(
+                                  agentName: 'Agent',
+                                  avatarUrl: agentAvatarUrl,
+                                ),
                               ),
                             );
                           },

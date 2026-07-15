@@ -200,7 +200,10 @@ class _HorizontalPropertyCard extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const AgentProfileScreen())),
+                            builder: (_) => AgentProfileScreen(
+                              agentName: 'Sarah Miller',
+                              avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+                            ))),
                         child: const CircleAvatar(
                           radius: 14,
                           backgroundImage: NetworkImage(
@@ -237,7 +240,10 @@ class _HorizontalPropertyCard extends StatelessWidget {
                       const Spacer(),
                       GestureDetector(
                         onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const ChatDetailScreen())),
+                            builder: (_) => ChatDetailScreen(
+                              contactName: 'Sarah Miller',
+                              avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+                            ))),
                         child: const Icon(Icons.more_horiz,
                             color: Color(0xFF6B7280), size: 20),
                       ),

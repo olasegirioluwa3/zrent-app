@@ -3,10 +3,17 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Agent Info Card Widget
-/// 
+///
 /// Shows agent avatar, name, title, and bio
 class AgentInfoCard extends StatelessWidget {
-  const AgentInfoCard({super.key});
+  final String agentName;
+  final String avatarUrl;
+
+  const AgentInfoCard({
+    super.key,
+    required this.agentName,
+    required this.avatarUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +37,7 @@ class AgentInfoCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Image.network(
-              'https://i.pravatar.cc/150?img=1',
+              avatarUrl,
               width: 100,
               height: 100,
               fit: BoxFit.cover,
@@ -51,7 +58,7 @@ class AgentInfoCard extends StatelessWidget {
           const SizedBox(height: 16),
           // Name
           Text(
-            'John Doe',
+            agentName,
             style: AppTypography.h3.copyWith(
               color: AppColors.textPrimary,
               fontWeight: AppTypography.bold,
@@ -80,7 +87,7 @@ class AgentInfoCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
+              color: const Color(0xFFBEF264), // Figma Lime Green
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -88,14 +95,14 @@ class AgentInfoCard extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.verified,
-                  color: AppColors.success,
+                  color: Color(0xFF042F2C), // Dark Teal
                   size: 16,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'Verified Agent',
                   style: AppTypography.labelMedium.copyWith(
-                    color: AppColors.success,
+                    color: const Color(0xFF042F2C), // Dark Teal
                     fontWeight: AppTypography.semiBold,
                   ),
                 ),

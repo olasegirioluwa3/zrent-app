@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../home/presentation/widgets/bottom_nav_bar.dart';
 import 'chat_detail_screen.dart';
+import '../../../agent_profile/presentation/screens/agent_profile_screen.dart';
 
 // ── Data Model ──────────────────────────────────────────────────────────────
 
@@ -229,12 +230,23 @@ class _ContactTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // ── Avatar ─────────────────────────────────────────────────
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: const Color(0xFFE5E7EB),
-              backgroundImage: NetworkImage(contact.avatarUrl),
-              onBackgroundImageError: (_, __) {},
+            // ── Avatar — tap to open agent profile ─────────────────────
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AgentProfileScreen(
+                    agentName: contact.name,
+                    avatarUrl: contact.avatarUrl,
+                  ),
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundImage: NetworkImage(contact.avatarUrl),
+                onBackgroundImageError: (_, __) {},
+              ),
             ),
 
             const SizedBox(width: 14),

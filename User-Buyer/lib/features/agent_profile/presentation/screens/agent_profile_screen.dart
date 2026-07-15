@@ -9,16 +9,23 @@ import '../widgets/reviews_section.dart';
 import '../widgets/contact_actions.dart';
 
 /// Agent Profile Screen - ZRent Buyer App
-/// 
+///
 /// Shows agent information with:
-/// - Profile header
-/// - Agent info card
+/// - Profile header (displays agent name)
+/// - Agent info card (avatar + name)
 /// - Stats (listings, rating, response time)
 /// - Property listings
 /// - Reviews
 /// - Contact actions
 class AgentProfileScreen extends StatelessWidget {
-  const AgentProfileScreen({super.key});
+  final String agentName;
+  final String avatarUrl;
+
+  const AgentProfileScreen({
+    super.key,
+    required this.agentName,
+    required this.avatarUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +34,23 @@ class AgentProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            const AgentProfileHeader(),
+            // Header — shows agent name as title
+            AgentProfileHeader(agentName: agentName),
             // Content
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    SizedBox(height: 24),
-                    AgentInfoCard(),
-                    SizedBox(height: 24),
-                    AgentStats(),
-                    SizedBox(height: 24),
-                    AgentListings(),
-                    SizedBox(height: 24),
-                    ReviewsSection(),
-                    SizedBox(height: 100), // Space for bottom actions
+                  children: [
+                    const SizedBox(height: 24),
+                    AgentInfoCard(agentName: agentName, avatarUrl: avatarUrl),
+                    const SizedBox(height: 24),
+                    const AgentStats(),
+                    const SizedBox(height: 24),
+                    const AgentListings(),
+                    const SizedBox(height: 24),
+                    const ReviewsSection(),
+                    const SizedBox(height: 100), // Space for bottom actions
                   ],
                 ),
               ),

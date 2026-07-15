@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 /// 
 /// Extracted from home.png screenshot for pixel-perfect matching
 class AppColors {
-  // Primary Colors - Purple/Indigo from screenshot
-  static const Color primary = Color(0xFF6366F1);
-  static const Color primaryDark = Color(0xFF4F46E5);
-  static const Color primaryLight = Color(0xFF818CF8);
+  // Primary Colors - Dark Teal from mockup/Figma
+  static const Color primary = Color(0xFF042F2C);
+  static const Color primaryDark = Color(0xFF021B19);
+  static const Color primaryLight = Color(0xFF0C4D49);
 
-  // Secondary Colors
-  static const Color secondary = Color(0xFF10B981);
-  static const Color secondaryDark = Color(0xFF059669);
+  // Secondary Colors - Lime Green
+  static const Color secondary = Color(0xFFBEF264);
+  static const Color secondaryDark = Color(0xFF84CC16);
 
   // Background Colors - Light gray from screenshot
   static const Color background = Color(0xFFF8F9FA);
