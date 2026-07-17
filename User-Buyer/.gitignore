@@ -1,45 +1,215 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# ===============================
+# Flutter/Dart Generated Files
+# ===============================
 
-# IntelliJ related
+.dart_tool/
+.packages
+.pub/
+build/
+releases/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub-cache/
+.flutter/
+
+# Generated plugin registrant
+**/generated_plugin_registrant.dart
+
+
+# ===============================
+# Dart Coverage
+# ===============================
+
+coverage/
+*.lcov
+
+
+# ===============================
+# IDE Files
+# ===============================
+
+# Android Studio
+.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code
+.vscode/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
+# IntelliJ
+*.iml
 
-# Symbolication related
-app.*.symbols
 
-# Obfuscation related
-app.*.map.json
+# ===============================
+# Operating System Files
+# ===============================
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+
+# ===============================
+# Android Build Files
+# ===============================
+
+android/.gradle/
+android/local.properties
+android/.idea/
+
+**/build/
+
+# Android Studio generated files
+*.apk
+*.aab
+*.apks
+*.dex
+
+
+# ===============================
+# Android Signing Keys
+# IMPORTANT: NEVER COMMIT THESE
+# ===============================
+
+*.jks
+*.keystore
+key.properties
+
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+
+
+# ===============================
+# iOS Generated Files
+# ===============================
+
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+
+ios/Runner.xcworkspace/
+ios/Runner/GeneratedPluginRegistrant.*
+
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
+xcuserdata/
+DerivedData/
+
+
+# ===============================
+# Environment Variables
+# ===============================
+
+.env
+.env.*
+!.env.example
+
+
+# ===============================
+# Firebase Files
+# ===============================
+
+# Firebase configuration files
+# Remove if your project requires committing them
+
+google-services.json
+GoogleService-Info.plist
+
+
+# ===============================
+# Firebase CLI
+# ===============================
+
+.firebase/
+firebase-debug.log
+
+
+# ===============================
+# Logs
+# ===============================
+
+*.log
+
+
+# ===============================
+# Temporary Files
+# ===============================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+
+# ===============================
+# Release Files
+# ===============================
+
+release/
+dist/
+
+# Generated archives
+*.zip
+*.tar.gz
+
+
+# ===============================
+# Fastlane
+# ===============================
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+
+# ===============================
+# Shorebird (if used)
+# ===============================
+
+.shorebird/
+
+
+# ===============================
+# FVM Flutter Version Manager
+# ===============================
+
+.fvm/flutter_sdk
+
+
+# ===============================
+# Melos / Monorepo
+# ===============================
+
+.melos_tool/
+
+
+# ===============================
+# Local Configuration
+# ===============================
+
+*.local
+*.config
+
+
+# ===============================
+# Secret Files
+# ===============================
+
+secrets/
+credentials/
+private/
