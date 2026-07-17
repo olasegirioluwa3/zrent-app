@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/providers/properties_provider.dart';
+import '../../../../shared/providers/filtered_properties_provider.dart';
 import '../../../property/presentation/screens/property_detail_screen.dart';
 
 /// Agent Listings Widget
 /// 
-/// Shows agent's property listings
+/// Shows the agent's property listings filtered by the globally-selected location.
 class AgentListings extends ConsumerWidget {
   const AgentListings({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final properties = ref.watch(propertiesProvider);
+    final properties = ref.watch(filteredPropertiesProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

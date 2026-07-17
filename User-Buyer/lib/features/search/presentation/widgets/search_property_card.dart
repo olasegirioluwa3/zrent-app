@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../property/presentation/screens/property_detail_screen.dart';
 
 /// Search Property Card Widget
 /// 
 /// Property card for search results (similar to favorites card)
 class SearchPropertyCard extends StatelessWidget {
+  final String propertyId;
   final String imageUrl;
   final String title;
   final String location;
@@ -14,6 +16,7 @@ class SearchPropertyCard extends StatelessWidget {
 
   const SearchPropertyCard({
     super.key,
+    this.propertyId = '1',
     required this.imageUrl,
     required this.title,
     required this.location,
@@ -23,7 +26,15 @@ class SearchPropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PropertyDetailScreen(propertyId: propertyId),
+          ),
+        );
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -162,6 +173,7 @@ class SearchPropertyCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }

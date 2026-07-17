@@ -5,6 +5,8 @@ import '../../../../shared/providers/properties_provider.dart';
 import '../../../agent_profile/presentation/screens/agent_profile_screen.dart';
 import '../../../messages/presentation/screens/chat_detail_screen.dart';
 
+import '../../../property/presentation/screens/property_detail_screen.dart';
+
 /// Property Card Widget - ZRent Buyer App
 ///
 /// Implements the grid item matching the Figma mockup:
@@ -40,7 +42,15 @@ class PropertyCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final darkTeal = const Color(0xFF042F2C);
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PropertyDetailScreen(propertyId: id),
+          ),
+        );
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -244,6 +254,7 @@ class PropertyCard extends ConsumerWidget {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }

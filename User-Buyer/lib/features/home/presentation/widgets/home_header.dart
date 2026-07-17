@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'search_bar.dart';
 import 'category_chips.dart';
+import 'location_bottom_sheet.dart';
 import '../providers/location_provider.dart';
 
 /// Home Header Widget - ZRent Buyer App
@@ -68,32 +69,17 @@ class HomeHeader extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 6),
-                      // ── Location row with dropdown ─────────────────
-                      PopupMenuButton<String>(
-                        offset: const Offset(0, 36),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        onSelected: (value) =>
-                            ref.read(locationProvider.notifier).setLocation(value),
-                        itemBuilder: (_) => [
-                          'Lagos, Nigeria',
-                          'Abuja, Nigeria',
-                          'Ibadan, Nigeria',
-                          'Port Harcourt, Nigeria',
-                          'Kano, Nigeria',
-                          'Enugu, Nigeria',
-                        ]
-                            .map(
-                              (city) => PopupMenuItem(
-                                value: city,
-                                child: Text(
-                                  city,
-                                  style: GoogleFonts.poppins(fontSize: 14),
-                                ),
-                              ),
-                            )
-                            .toList(),
+                      // ── Location row — tapping opens the Location Picker ────
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            useSafeArea: true,
+                            builder: (_) => const LocationBottomSheet(),
+                          );
+                        },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -115,7 +101,7 @@ class HomeHeader extends ConsumerWidget {
                             ),
                             const SizedBox(width: 2),
                             const Icon(
-                              Icons.arrow_drop_down,
+                              Icons.keyboard_arrow_down,
                               color: Colors.white,
                               size: 22,
                             ),

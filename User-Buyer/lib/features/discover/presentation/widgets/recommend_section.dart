@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../agent_profile/presentation/screens/agent_profile_screen.dart';
 import '../../../messages/presentation/screens/chat_detail_screen.dart';
+import '../../../property/presentation/screens/property_detail_screen.dart';
 
 /// Recommend Section - ZRent Buyer Discover Screen
 ///
@@ -119,7 +120,15 @@ class _HorizontalPropertyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const darkTeal = Color(0xFF042F2C);
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const PropertyDetailScreen(propertyId: '1'),
+          ),
+        );
+      },
+      child: Container(
       width: 300,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -255,7 +264,8 @@ class _HorizontalPropertyCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }
 
@@ -275,7 +285,15 @@ class _GridPropertyCardState extends State<_GridPropertyCard> {
   Widget build(BuildContext context) {
     const darkTeal = Color(0xFF042F2C);
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const PropertyDetailScreen(propertyId: '1'),
+          ),
+        );
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -372,7 +390,8 @@ class _GridPropertyCardState extends State<_GridPropertyCard> {
           ),
         ],
       ),
-    );
+    ),
+   );
   }
 }
 
