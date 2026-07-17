@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../shared/providers/properties_provider.dart';
+import '../../../../shared/providers/filtered_properties_provider.dart';
 import '../../../home/presentation/widgets/property_card.dart';
 
 /// Saved Properties Grid Widget - ZRent Buyer App
 ///
-/// Watches the shared propertiesProvider and renders a 2-column grid of properties
-/// that have been favorited by the user (isFavorite: true).
-/// If no properties are favorited, it displays a premium empty state.
+/// Renders saved/favourite properties filtered by the currently-selected
+/// location. Uses [filteredFavouritesProvider] so the home-screen location
+/// picker applies here too.
+/// Falls back to a premium empty state when no favourites match the location.
 class SavedPropertiesGrid extends ConsumerWidget {
   const SavedPropertiesGrid({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allProperties = ref.watch(propertiesProvider);
-    final savedProperties = allProperties.where((prop) => prop.isFavorite).toList();
+    // Use location-filtered favourites so picks on the home page apply here
+    final savedProperties = ref.watch(filteredFavouritesProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
