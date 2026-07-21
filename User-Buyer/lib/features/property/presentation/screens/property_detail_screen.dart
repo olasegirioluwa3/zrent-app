@@ -6,6 +6,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../messages/presentation/screens/chat_detail_screen.dart';
 import '../../../checkout/presentation/screens/checkout_screen.dart';
 import '../../../../shared/providers/properties_provider.dart';
+import '../widgets/property_reviews_section.dart';
+import '../providers/property_reviews_provider.dart';
 
 /// Property Detail Screen - ZRent Buyer App
 /// 
@@ -46,6 +48,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
   Widget build(BuildContext context) {
     final darkTeal = const Color(0xFF042F2C);
     final limeGreen = const Color(0xFFBEF264);
+    final reviewsState = ref.watch(propertyReviewsProvider(widget.propertyId));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -463,7 +466,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                             const Icon(Icons.star, color: Color(0xFFFFB800), size: 18),
                             const SizedBox(width: 4),
                             Text(
-                              '4.8',
+                              '${reviewsState.averageRating}',
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -472,7 +475,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              '(128 reviews)',
+                              '(${reviewsState.totalReviews} reviews)',
                               style: GoogleFonts.poppins(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w400,
@@ -660,6 +663,10 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 28),
+                        
+                        // Property Ratings & Reviews Section
+                        PropertyReviewsSection(propertyId: widget.propertyId),
                         
                         // Extra bottom padding to scroll past the fixed bottom bar
                         const SizedBox(height: 110),

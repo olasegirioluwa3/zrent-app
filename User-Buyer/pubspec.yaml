@@ -75,3 +75,6 @@ flutter:
     - assets/images/get_started_background.png
     - assets/icons/
     - assets/header_house.png
+    - assets/images/splash_logo.png
+    - assets/images/sign_up_logo.png
+    - assets/images/get_started_logo.png

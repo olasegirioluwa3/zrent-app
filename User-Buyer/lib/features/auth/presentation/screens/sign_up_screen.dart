@@ -58,26 +58,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     Image.asset(
                       'assets/images/sign_up_logo.png',
-                      width: 60,
-                      height: 60,
+                      width: 130,
+                      height: 130,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(width: 48), // Balance the row
+                    const SizedBox(width: 50), // Balance the row
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 2),
                 // Title
                 const Text(
                   'Join the Global Alpha',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E3A8A),
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF000000),
                     letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 2),
                 // Subtitle
                 const Text(
                   'Get exclusive access to premium properties and personalized recommendations tailored just for you.',
@@ -141,7 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF84CC16),
-                      foregroundColor: const Color(0xFF1E3A8A),
+                      foregroundColor: const Color(0xFF000000),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -211,7 +211,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           icon: const Icon(
                             Icons.g_mobiledata,
                             size: 24,
-                            color: Color(0xFF1E3A8A),
+                            color: Color(0xFF000000),
                           ),
                           label: const Text(
                             'Google',
@@ -219,7 +219,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontFamily: 'Poppins',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF1E3A8A),
+                              color: Color(0xFF000000),
                             ),
                           ),
                         ),
@@ -244,7 +244,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           icon: const Icon(
                             Icons.apple,
                             size: 24,
-                            color: Color(0xFF1E3A8A),
+                            color: Color(0xFF000000),
                           ),
                           label: const Text(
                             'Apple',
@@ -252,7 +252,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontFamily: 'Poppins',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF1E3A8A),
+                              color: Color(0xFF000000),
                             ),
                           ),
                         ),

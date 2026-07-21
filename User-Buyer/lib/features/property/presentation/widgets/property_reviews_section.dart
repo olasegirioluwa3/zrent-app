@@ -2,96 +2,114 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../domain/entities/agent_review.dart';
-import '../providers/agent_reviews_provider.dart';
-import 'add_review_modal.dart';
+import '../../domain/entities/property_review.dart';
+import '../providers/property_reviews_provider.dart';
+import 'add_property_review_modal.dart';
 
-/// Reviews Section Widget - ZRent Buyer App
+/// Property Reviews Section Widget - ZRent Buyer App
 /// 
-/// Displays ratings and client reviews with:
-/// - Header with total count & "+ Add Review" trigger
-/// - Review cards list
-/// - "Did you find this helpful? Yes / No" interaction & helpful count
-class ReviewsSection extends ConsumerWidget {
-  const ReviewsSection({super.key});
+/// Displays ratings and tenant/renter reviews for a specific property:
+/// - Summary rating score & total reviews count
+/// - "+ Add Review" modal trigger button
+/// - Review cards with "Did you find this helpful? Yes / No" feedback
+class PropertyReviewsSection extends ConsumerWidget {
+  final String propertyId;
+
+  const PropertyReviewsSection({
+    super.key,
+    required this.propertyId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reviewsState = ref.watch(agentReviewsProvider);
+    final reviewsState = ref.watch(propertyReviewsProvider(propertyId));
     final reviews = reviewsState.reviews;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Reviews',
-                    style: AppTypography.h4.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: AppTypography.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${reviewsState.totalReviews} client ratings',
-                    style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.textTertiary,
-                    ),
-                  ),
-                ],
-              ),
-              // Add Review Button
-              InkWell(
-                onTap: () => AddReviewModal.show(context),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.rate_review_outlined,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Add Review',
-                        style: AppTypography.labelMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: AppTypography.bold,
-                        ),
-                      ),
-                    ],
+        // Section Header Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ratings & Reviews',
+                  style: AppTypography.h4.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: AppTypography.bold,
                   ),
                 ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Color(0xFFFFB800), size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${reviewsState.averageRating}',
+                      style: AppTypography.labelMedium.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: AppTypography.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${reviewsState.totalReviews} reviews)',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // "+ Add Review" Button
+            InkWell(
+              onTap: () => AddPropertyReviewModal.show(context, propertyId: propertyId),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.rate_review_outlined,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Add Review',
+                      style: AppTypography.labelMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: AppTypography.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
+
         // Reviews List
         if (reviews.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Center(
               child: Text(
-                'No reviews yet. Be the first to review this agent!',
+                'No reviews for this property yet. Be the first to leave a review!',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textTertiary,
                 ),
@@ -102,12 +120,14 @@ class ReviewsSection extends ConsumerWidget {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: reviews.length,
             separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final review = reviews[index];
-              return _ReviewCard(review: review);
+              return _PropertyReviewCard(
+                review: review,
+                propertyId: propertyId,
+              );
             },
           ),
       ],
@@ -115,11 +135,13 @@ class ReviewsSection extends ConsumerWidget {
   }
 }
 
-class _ReviewCard extends ConsumerWidget {
-  final AgentReview review;
+class _PropertyReviewCard extends ConsumerWidget {
+  final PropertyReview review;
+  final String propertyId;
 
-  const _ReviewCard({
+  const _PropertyReviewCard({
     required this.review,
+    required this.propertyId,
   });
 
   @override
@@ -140,7 +162,7 @@ class _ReviewCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Reviewer Info Row
+          // Reviewer Header
           Row(
             children: [
               ClipRRect(
@@ -179,7 +201,6 @@ class _ReviewCard extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        // Star Rating
                         Row(
                           children: List.generate(5, (starIdx) {
                             return Icon(
@@ -216,7 +237,7 @@ class _ReviewCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Review Comment Text
+          // Review Text
           Text(
             review.review,
             style: AppTypography.bodyMedium.copyWith(
@@ -227,7 +248,7 @@ class _ReviewCard extends ConsumerWidget {
           const SizedBox(height: 14),
           const Divider(height: 1, color: AppColors.border),
           const SizedBox(height: 12),
-          // "Did you find this helpful? Yes / No" Row
+          // Helpful Vote Row
           Row(
             children: [
               Text(
@@ -240,7 +261,9 @@ class _ReviewCard extends ConsumerWidget {
               // Yes Button
               InkWell(
                 onTap: () {
-                  ref.read(agentReviewsProvider.notifier).toggleHelpful(
+                  ref
+                      .read(propertyReviewsProvider(propertyId).notifier)
+                      .toggleHelpful(
                         reviewId: review.id,
                         isHelpful: true,
                       );
@@ -280,7 +303,9 @@ class _ReviewCard extends ConsumerWidget {
               // No Button
               InkWell(
                 onTap: () {
-                  ref.read(agentReviewsProvider.notifier).toggleHelpful(
+                  ref
+                      .read(propertyReviewsProvider(propertyId).notifier)
+                      .toggleHelpful(
                         reviewId: review.id,
                         isHelpful: false,
                       );

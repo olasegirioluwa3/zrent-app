@@ -50,14 +50,14 @@ class _SplashScreenState extends State<SplashScreen> {
               // Logo image
               Image.asset(
                 'assets/images/splash_logo.png',
-                width: 120,
-                height: 120,
+                width: 200,
+                height: 200,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 15),
               // ZRent text
               const Text(
-                'ZRent',
+                '',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 42,

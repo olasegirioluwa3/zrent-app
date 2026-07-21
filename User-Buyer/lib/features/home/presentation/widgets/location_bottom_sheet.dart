@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:geocoding/geocoding.dart';
 import '../providers/location_provider.dart';
 
 /// Location Bottom Sheet - ZRent Buyer App
@@ -11,6 +12,7 @@ import '../providers/location_provider.dart';
 /// - Location section with a toggle switch: "All locations within the Nigeria".
 /// - Rounded input field: "Enter city or state / province".
 /// - Searchable listing of cities/states within the chosen country.
+/// - Uses Geocoding to query Google Maps/native database dynamically for real cities/areas.
 /// - Apply button to save selected location filter.
 class LocationBottomSheet extends ConsumerStatefulWidget {
   const LocationBottomSheet({super.key});
@@ -27,6 +29,10 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Dynamic geocoded results state
+  bool _isSearchingGeocoding = false;
+  List<String> _geocodedSuggestions = [];
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +46,69 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _performGeocodingSearch(String query) async {
+    if (query.trim().length < 3) {
+      setState(() {
+        _geocodedSuggestions = [];
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearchingGeocoding = true;
+    });
+
+    try {
+      // Search within the selected country context
+      final fullQuery = '$query, $_selectedCountry';
+      final locations = await locationFromAddress(fullQuery);
+      
+      final List<String> tempSuggestions = [];
+      for (final loc in locations.take(5)) {
+        final placemarks = await placemarkFromCoordinates(loc.latitude, loc.longitude);
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+          String? subLocality = place.subLocality;
+          String? locality = place.locality;
+          String? subAdmin = place.subAdministrativeArea;
+          String? admin = place.administrativeArea;
+
+          String area = '';
+          if (subLocality != null && subLocality.isNotEmpty) {
+            if (locality != null && locality.isNotEmpty && subLocality != locality) {
+              area = '$subLocality, $locality';
+            } else {
+              area = subLocality;
+            }
+          } else if (locality != null && locality.isNotEmpty) {
+            area = locality;
+          } else if (subAdmin != null && subAdmin.isNotEmpty) {
+            area = subAdmin;
+          } else if (admin != null && admin.isNotEmpty) {
+            area = admin;
+          }
+
+          if (area.isNotEmpty && !tempSuggestions.contains(area)) {
+            tempSuggestions.add(area);
+          }
+        }
+      }
+
+      setState(() {
+        _geocodedSuggestions = tempSuggestions;
+        _isSearchingGeocoding = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isSearchingGeocoding = false;
+        // Fallback: let them select exactly what they typed if geocoding yields no results
+        if (query.isNotEmpty && !_geocodedSuggestions.contains(query)) {
+          _geocodedSuggestions = [query];
+        }
+      });
+    }
   }
 
   void _showCountryPicker() {
@@ -122,6 +191,9 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                                 // Reset selected city
                                 final cities = LocationNotifier.countryLocations[country] ?? [];
                                 _selectedCity = cities.isNotEmpty ? cities.first : null;
+                                _geocodedSuggestions = [];
+                                _searchController.clear();
+                                _searchQuery = '';
                               });
                               Navigator.pop(context);
                             },
@@ -254,6 +326,7 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                             _selectedCity = null;
                             _searchController.clear();
                             _searchQuery = '';
+                            _geocodedSuggestions = [];
                           } else {
                             // Default to first city if none chosen
                             if (_selectedCity == null && availableCities.isNotEmpty) {
@@ -281,6 +354,16 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                   fontWeight: FontWeight.w400,
                 ),
                 prefixIcon: const Icon(Icons.location_on_outlined, color: Colors.grey, size: 20),
+                suffixIcon: _isSearchingGeocoding
+                    ? const Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Color(0xFF042F2C))),
+                        ),
+                      )
+                    : null,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -302,79 +385,66 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                 setState(() {
                   _searchQuery = val;
                 });
+                _performGeocodingSearch(val);
               },
             ),
             const SizedBox(height: 14),
 
             // 4. Cities List (Visible when "All locations" toggle is OFF)
             if (!_allLocationsEnabled) ...[
-              Text(
-                'Available locations in $_selectedCountry:',
-                style: GoogleFonts.poppins(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 150,
-                child: filteredCities.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No matching locations found.',
-                          style: GoogleFonts.poppins(color: Colors.grey, fontSize: 13),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    // Dynamic discovered areas section
+                    if (_geocodedSuggestions.isNotEmpty) ...[
+                      Text(
+                        'Discovered Locations:',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: darkTeal,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      ..._geocodedSuggestions.map((city) {
+                        final isSelected = city == _selectedCity;
+                        return _buildLocationTile(city, isSelected, darkTeal, isDynamic: true);
+                      }),
+                      const SizedBox(height: 14),
+                    ],
+
+                    // Standard suggested cities section
+                    Text(
+                      'Suggested Locations in $_selectedCountry:',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    if (filteredCities.isEmpty && _geocodedSuggestions.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            'No matching locations found.',
+                            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 13),
+                          ),
                         ),
                       )
-                    : ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: filteredCities.length,
-                        itemBuilder: (context, index) {
-                          final city = filteredCities[index];
-                          final isSelected = city == _selectedCity;
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedCity = city;
-                              });
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: isSelected ? darkTeal.withOpacity(0.06) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isSelected ? darkTeal : Colors.grey.shade200,
-                                  width: isSelected ? 1.5 : 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_city,
-                                    color: isSelected ? darkTeal : Colors.grey,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    city,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 13.5,
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                      color: isSelected ? darkTeal : Colors.black87,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (isSelected)
-                                    Icon(Icons.check_circle, color: darkTeal, size: 18),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                    else
+                      ...filteredCities.map((city) {
+                        // Skip if already listed in geocoded suggestions
+                        if (_geocodedSuggestions.contains(city)) {
+                          return const SizedBox.shrink();
+                        }
+                        final isSelected = city == _selectedCity;
+                        return _buildLocationTile(city, isSelected, darkTeal);
+                      }),
+                  ],
+                ),
               ),
             ] else ...[
               // Information message when all locations switch is active
@@ -396,6 +466,7 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                   ),
                 ),
               ),
+              const Spacer(),
             ],
             const SizedBox(height: 24),
 
@@ -429,6 +500,50 @@ class _LocationBottomSheetState extends ConsumerState<LocationBottomSheet> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationTile(String city, bool isSelected, Color darkTeal, {bool isDynamic = false}) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedCity = city;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? darkTeal.withOpacity(0.06) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? darkTeal : Colors.grey.shade200,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isDynamic ? Icons.map_outlined : Icons.location_city,
+              color: isSelected ? darkTeal : Colors.grey,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                city,
+                style: GoogleFonts.poppins(
+                  fontSize: 13.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? darkTeal : Colors.black87,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle, color: darkTeal, size: 18),
           ],
         ),
       ),

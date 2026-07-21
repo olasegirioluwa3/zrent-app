@@ -143,25 +143,51 @@ class LocationNotifier extends StateNotifier<LocationState> {
         return;
       }
 
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 5),
-      );
+      Position? position = await Geolocator.getLastKnownPosition();
+      
+      if (position == null) {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low,
+          timeLimit: const Duration(seconds: 15),
+        );
+      }
 
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
-      );
+      ).timeout(const Duration(seconds: 10), onTimeout: () => <Placemark>[]);
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        String city = place.locality ?? place.subAdministrativeArea ?? place.administrativeArea ?? '';
-        String country = place.country ?? 'Nigeria';
         
+        // Extract sub-locality (e.g., Ikeja, Lekki, Yaba) and locality/admin area (e.g., Lagos)
+        String? subLocality = place.subLocality;
+        String? locality = place.locality;
+        String? subAdminArea = place.subAdministrativeArea;
+        String? adminArea = place.administrativeArea;
+        String country = place.country ?? 'Nigeria';
+
+        String resolvedCity = '';
+        
+        // Build a detailed city/area description
+        if (subLocality != null && subLocality.isNotEmpty) {
+          if (locality != null && locality.isNotEmpty && subLocality != locality) {
+            resolvedCity = '$subLocality, $locality';
+          } else {
+            resolvedCity = subLocality;
+          }
+        } else if (locality != null && locality.isNotEmpty) {
+          resolvedCity = locality;
+        } else if (subAdminArea != null && subAdminArea.isNotEmpty) {
+          resolvedCity = subAdminArea;
+        } else if (adminArea != null && adminArea.isNotEmpty) {
+          resolvedCity = adminArea;
+        }
+
         updateLocation(
           country: country,
-          allLocationsEnabled: city.isEmpty,
-          city: city.isNotEmpty ? city : null,
+          allLocationsEnabled: resolvedCity.isEmpty,
+          city: resolvedCity.isNotEmpty ? resolvedCity : null,
         );
       } else {
         state = state.copyWith(

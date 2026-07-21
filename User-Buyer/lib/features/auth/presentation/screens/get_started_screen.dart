@@ -58,17 +58,17 @@ class GetStartedScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 35),
                   // Logo
                   Center(
                     child: Image.asset(
                       'assets/images/get_started_logo.png',
-                      width: 80,
-                      height: 80,
+                      width: 250,
+                      height: 250,
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 230),
                   // Title
                   const Text(
                     'All-In-One Real\nEstate Platform',
@@ -81,7 +81,7 @@ class GetStartedScreen extends StatelessWidget {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   // Subtitle
                   const Text(
                     'Discover Our Exceptional Properties. Crafted as Masterpieces with Lasting Value for Client',
@@ -106,7 +106,7 @@ class GetStartedScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF84CC16),
-                        foregroundColor: const Color(0xFF1E3A8A),
+                        foregroundColor: const Color(0xFF000000),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -141,7 +141,7 @@ class GetStartedScreen extends StatelessWidget {
                             icon: const Icon(
                               Icons.g_mobiledata,
                               size: 24,
-                              color: Color(0xFF1E3A8A),
+                              color: Color(0xFF000000),
                             ),
                             label: const Text(
                               'Google',
@@ -149,7 +149,7 @@ class GetStartedScreen extends StatelessWidget {
                                 fontFamily: 'Poppins',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: Color(0xFF1E3A8A),
+                                color: Color(0xFF000000),
                               ),
                             ),
                           ),
@@ -170,7 +170,7 @@ class GetStartedScreen extends StatelessWidget {
                             icon: const Icon(
                               Icons.apple,
                               size: 24,
-                              color: Color(0xFF1E3A8A),
+                              color: Color(0xFF000000),
                             ),
                             label: const Text(
                               'Apple',
@@ -178,7 +178,7 @@ class GetStartedScreen extends StatelessWidget {
                                 fontFamily: 'Poppins',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: Color(0xFF1E3A8A),
+                                color: Color(0xFF000000),
                               ),
                             ),
                           ),

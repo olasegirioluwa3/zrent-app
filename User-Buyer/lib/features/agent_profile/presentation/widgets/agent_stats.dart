@@ -1,44 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../providers/agent_reviews_provider.dart';
 
 /// Agent Stats Widget
 /// 
-/// Shows agent statistics (listings, rating, response time)
-class AgentStats extends StatelessWidget {
+/// Shows agent statistics (listings, rating, response time, earnings)
+/// Dynamically updates rating & review count from [agentReviewsProvider]
+class AgentStats extends ConsumerWidget {
   const AgentStats({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reviewsState = ref.watch(agentReviewsProvider);
+    final ratingText = '${reviewsState.averageRating} (${reviewsState.totalReviews})';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        children: const [
-          Expanded(
+        children: [
+          const Expanded(
             child: _StatItem(
               icon: Icons.home_work_outlined,
               label: 'Listings',
               value: '45',
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: _StatItem(
               icon: Icons.star_outlined,
               label: 'Rating',
-              value: '4.9 (128)',
+              value: ratingText,
             ),
           ),
-          SizedBox(width: 8),
-          Expanded(
+          const SizedBox(width: 8),
+          const Expanded(
             child: _StatItem(
               icon: Icons.access_time,
               label: 'Response',
               value: '1h',
             ),
           ),
-          SizedBox(width: 8),
-          Expanded(
+          const SizedBox(width: 8),
+          const Expanded(
             child: _StatItem(
               icon: Icons.monetization_on_outlined,
               label: 'Earned',

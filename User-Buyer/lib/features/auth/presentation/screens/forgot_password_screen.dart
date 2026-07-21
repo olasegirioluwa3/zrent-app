@@ -52,14 +52,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     Image.asset(
                       'assets/images/sign_up_logo.png',
-                      width: 60,
-                      height: 60,
+                      width: 130,
+                      height: 130,
                       fit: BoxFit.contain,
                     ),
                     const SizedBox(width: 48), // Balance the row
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 2),
                 // Title
                 const Text(
                   'Forgot Password?',
@@ -67,7 +67,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     fontFamily: 'Poppins',
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1E3A8A),
+                    color: Color(0xFF000000),
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -107,7 +107,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF84CC16),
-                      foregroundColor: const Color(0xFF1E3A8A),
+                      foregroundColor: const Color(0xFF000000),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

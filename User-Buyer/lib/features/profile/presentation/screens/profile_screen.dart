@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../home/presentation/widgets/bottom_nav_bar.dart';
+import 'dart:io';
+import 'payment_details_screen.dart';
+import 'support_screen.dart';
+import 'edit_profile_screen.dart';
+import 'package:zrent_buyer/shared/providers/profile_provider.dart';
+import '../../../home/presentation/providers/location_provider.dart';
 
 /// Profile Screen - ZRent Buyer App
 ///
 /// User profile screen displaying:
 /// - Profile picture and name
-/// - Date and location info
+/// - Date and location info (dynamic location from locationProvider)
 /// - Edit button
-/// - Other information section (Notification, Payment, Location, Support, Log out)
+/// - Other information section (Notification, Payment, Location switch, Support, Log out)
 /// - Bottom navigation bar
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _notificationsEnabled = true;
+  bool _locationEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +38,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
 
+    final locationState = ref.watch(locationProvider);
+    final profileState = ref.watch(profileProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
       body: SafeArea(
@@ -39,16 +50,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const SizedBox(height: 32),
               // Profile picture
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
-                backgroundColor: Color(0xFFE5E7EB),
+                backgroundColor: const Color(0xFFE5E7EB),
+                backgroundImage: profileState.profilePicturePath != null
+                    ? (profileState.isProfilePicLocal
+                        ? FileImage(File(profileState.profilePicturePath!)) as ImageProvider
+                        : AssetImage(profileState.profilePicturePath!) as ImageProvider)
+                    : const AssetImage('assets/images/profile_placeholder.png'),
               ),
               const SizedBox(height: 16),
               // Name
-              const Text(
-                'Bessie Cooper',
-                style: TextStyle(
+              Text(
+                profileState.name,
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
@@ -67,10 +82,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              // Location
-              const Text(
-                'Ikeja, Lagos, Nigeria',
-                style: TextStyle(
+              // Address Location
+              Text(
+                profileState.address,
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -81,7 +96,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Edit button
               OutlinedButton.icon(
                 onPressed: () {
-                  // TODO: Navigate to edit profile screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfileScreen(),
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.edit_outlined,
@@ -148,17 +168,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icons.payment_outlined,
                       title: 'Payment',
                       onTap: () {
-                        // TODO: Navigate to payment screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PaymentDetailsScreen(),
+                          ),
+                        );
                       },
                     ),
                     const Divider(height: 1, color: Color(0xFFE5E7EB)),
-                    // Location
+                    // Location with toggle switch
                     _buildMenuItem(
                       icon: Icons.location_on_outlined,
                       title: 'Location',
-                      onTap: () {
-                        // TODO: Navigate to location screen
-                      },
+                      trailing: Switch(
+                        value: _locationEnabled,
+                        onChanged: (value) async {
+                          setState(() {
+                            _locationEnabled = value;
+                          });
+                          if (value) {
+                            await ref.read(locationProvider.notifier).requestAndFetchLocation();
+                            if (!mounted) return;
+                            final updatedState = ref.read(locationProvider);
+                            if (updatedState.errorMessage != null) {
+                              setState(() {
+                                _locationEnabled = false;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(updatedState.errorMessage!),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                            }
+                          } else {
+                            // Reset location to default when toggled off
+                            ref.read(locationProvider.notifier).updateLocation(
+                              country: 'Nigeria',
+                              allLocationsEnabled: false,
+                              city: 'Lagos',
+                            );
+                          }
+                        },
+                        activeColor: const Color(0xFF84CC16),
+                      ),
                     ),
                     const Divider(height: 1, color: Color(0xFFE5E7EB)),
                     // Support
@@ -166,7 +220,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icons.support_agent_outlined,
                       title: 'Support',
                       onTap: () {
-                        // TODO: Navigate to support screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SupportScreen(),
+                          ),
+                        );
                       },
                     ),
                     const Divider(height: 1, color: Color(0xFFE5E7EB)),
